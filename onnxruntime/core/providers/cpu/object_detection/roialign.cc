@@ -268,7 +268,7 @@ void RoiAlignForward(const TensorShape& output_shape,
         }  // for pw
       }    // for ph
     }      // for c
-  });      // for n
+  }, 0);      // for n
 }
 }  // namespace
 

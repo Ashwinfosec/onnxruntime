@@ -202,6 +202,7 @@ class ThreadPool {
 
   // Similar to ParallelForWithWorkerId above, but takes the specified
   // scheduling strategy into account.
+  // `fn` takes 3 parameters: start, limit, id. Id starts from 1.
   void ParallelForWithWorkerId(std::ptrdiff_t total, const SchedulingParams& scheduling_params,
                                const std::function<void(std::ptrdiff_t, std::ptrdiff_t, int)>& fn);
 
@@ -223,8 +224,7 @@ class ThreadPool {
 
 #ifdef USE_OPENMP
   template <typename F>
-  inline static void TryBatchParallelFor(concurrency::ThreadPool*, std::ptrdiff_t total, F&& fn,
-                                         std::ptrdiff_t /*num_batches*/) {
+  inline static void TryBatchParallelFor(ThreadPool*, std::ptrdiff_t total, F&& fn, std::ptrdiff_t /*num_batches*/) {
 #pragma omp parallel for
     for (std::ptrdiff_t i = 0; i < total; ++i) {
       fn(i);
@@ -243,7 +243,7 @@ class ThreadPool {
    * ```
    **/
   template <typename F>
-  inline static void TryBatchParallelFor(ThreadPool* tp, std::ptrdiff_t total, F&& fn, std::ptrdiff_t num_batches = 0) {
+  inline static void TryBatchParallelFor(ThreadPool* tp, std::ptrdiff_t total, F&& fn, std::ptrdiff_t num_batches) {
     if (tp != nullptr) {
       for (std::ptrdiff_t i = 0; i < total; ++i) {
         // In many cases, fn can be inlined here.
